@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -7,14 +8,16 @@ namespace UglyTrivia
 {
     public class Game
     {
-
-
+        private const int WinningAmount = 6;
+        private const int MaxPlayers = 6;
+        
+        
         List<string> players = new List<string>();
 
-        int[] places = new int[6];
-        int[] purses = new int[6];
+        int[] places = new int[MaxPlayers];
+        int[] purses = new int[MaxPlayers];
 
-        bool[] inPenaltyBox = new bool[6];
+        bool[] inPenaltyBox = new bool[MaxPlayers];
 
         LinkedList<string> popQuestions = new LinkedList<string>();
         LinkedList<string> scienceQuestions = new LinkedList<string>();
@@ -34,7 +37,7 @@ namespace UglyTrivia
                 rockQuestions.AddLast(createRockQuestion(i));
             }
         }
-
+        
         public String createRockQuestion(int index)
         {
             return "Rock Question " + index;
@@ -134,15 +137,11 @@ namespace UglyTrivia
 
         private String currentCategory()
         {
-            if (places[currentPlayer] == 0) return "Pop";
-            if (places[currentPlayer] == 4) return "Pop";
-            if (places[currentPlayer] == 8) return "Pop";
-            if (places[currentPlayer] == 1) return "Science";
-            if (places[currentPlayer] == 5) return "Science";
-            if (places[currentPlayer] == 9) return "Science";
-            if (places[currentPlayer] == 2) return "Sports";
-            if (places[currentPlayer] == 6) return "Sports";
-            if (places[currentPlayer] == 10) return "Sports";
+            var categoryIndex = places[currentPlayer] % 4;
+            
+            if (categoryIndex == 0) return "Pop";
+            if (categoryIndex == 1) return "Science";
+            if (categoryIndex == 2) return "Sports";
             return "Rock";
         }
 
@@ -159,7 +158,7 @@ namespace UglyTrivia
                             + purses[currentPlayer]
                             + " Gold Coins.");
 
-                    bool winner = didPlayerWin();
+                    bool winner = playerHasNotWon();
                     currentPlayer++;
                     if (currentPlayer == players.Count) currentPlayer = 0;
 
@@ -171,13 +170,9 @@ namespace UglyTrivia
                     if (currentPlayer == players.Count) currentPlayer = 0;
                     return true;
                 }
-
-
-
             }
             else
             {
-
                 Console.WriteLine("Answer was corrent!!!!");
                 purses[currentPlayer]++;
                 Console.WriteLine(players[currentPlayer]
@@ -185,7 +180,7 @@ namespace UglyTrivia
                         + purses[currentPlayer]
                         + " Gold Coins.");
 
-                bool winner = didPlayerWin();
+                bool winner = playerHasNotWon();
                 currentPlayer++;
                 if (currentPlayer == players.Count) currentPlayer = 0;
 
@@ -204,11 +199,9 @@ namespace UglyTrivia
             return true;
         }
 
-
-        private bool didPlayerWin()
+        private bool playerHasNotWon()
         {
-            return !(purses[currentPlayer] == 6);
-        }
+            return purses[currentPlayer] != WinningAmount;
+        }   
     }
-
 }
